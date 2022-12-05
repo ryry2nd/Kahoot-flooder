@@ -1,8 +1,5 @@
 #imports
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from bot import flood
+from bot import Flood
 import json, os
 
-for bot in flood(100, "2014022", "bigPP"):
-    pass
+Flood(100, "3327294", "a")
