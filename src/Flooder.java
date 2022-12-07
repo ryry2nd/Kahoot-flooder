@@ -5,22 +5,26 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.Scanner;
 
 public class Flooder {
-    private int numBots;
     private String name;
     private String id;
     private ChromeOptions options;
 
-    public Flooder(int nBts, String identification, String nme) throws InterruptedException {
-        numBots = nBts;
+    public Flooder(int numBots, String identification, String nme) throws InterruptedException {
         id = identification;
         name = nme;
         options = new ChromeOptions();
         options.addArguments("--headless");
+        options.addArguments(" --allowed-ips");
         
-        for (int i = 0; i < nBts; i++) {
-            logInABot(0);
+        for (int i = 0; i < numBots; i++) {
+            logInABot(i);
         }
     }
 
@@ -44,8 +48,16 @@ public class Flooder {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Flooder fl = new Flooder(100, "5050140", "poopoo");
+    public static void main(String[] args) throws InterruptedException, FileNotFoundException, IOException {
+        Properties props = new Properties();
+
+        props.load(new FileInputStream("config.properties"));
+
+        int num = Integer.parseInt(props.getProperty("num"));
+        String id = props.getProperty("id");
+        String name = props.getProperty("name");
+        
+        new Flooder(num, id, name);
         while (true) {Thread.sleep(1000);}
     }
 }
