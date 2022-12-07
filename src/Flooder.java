@@ -1,4 +1,4 @@
-import org.openqa.selenium.WebDriver;
+//import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.WebElement;
@@ -9,22 +9,48 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.Scanner;
+
+import queue.Queue;
 
 public class Flooder {
     private String name;
     private String id;
     private ChromeOptions options;
+    private Queue que;
+    private int numBots;
 
-    public Flooder(int numBots, String identification, String nme) throws InterruptedException {
+    public Flooder(int numBts, String identification, String nme){
         id = identification;
         name = nme;
+        numBots = numBts;
+        que = new Queue();
         options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments(" --allowed-ips");
-        
+
+        addJobs();
+    }
+
+    public void start() {
+        worker();
+    }
+
+    private void addJobs() {
         for (int i = 0; i < numBots; i++) {
-            logInABot(i);
+            que.addJob(i);
+        }
+    }
+
+    private void worker() {
+        int it;
+
+        while (!que.isEmpty()) {
+            it = que.getJob();
+            try {
+                logInABot(it);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -57,7 +83,9 @@ public class Flooder {
         String id = props.getProperty("id");
         String name = props.getProperty("name");
         
-        new Flooder(num, id, name);
+        Flooder fl = new Flooder(num, id, name);
+        fl.start();
+
         while (true) {Thread.sleep(1000);}
     }
 }
