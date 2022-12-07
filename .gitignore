@@ -28,4 +28,4 @@ main.py
 bot.py
 config.json
 .vscode
-config.properties
+#config.properties

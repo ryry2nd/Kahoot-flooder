@@ -12,17 +12,32 @@ import java.util.Properties;
 
 import queue.Queue;
 
-public class Flooder {
+public class Flooder{
     private String name;
     private String id;
     private ChromeOptions options;
     private Queue que;
     private int numBots;
+    private byte numThreads;
 
     public Flooder(int numBts, String identification, String nme){
         id = identification;
         name = nme;
         numBots = numBts;
+        numThreads = 1;
+        que = new Queue();
+        options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments(" --allowed-ips");
+
+        addJobs();
+    }
+
+    public Flooder(int numBts, String identification, String nme, byte threads) {
+        id = identification;
+        name = nme;
+        numBots = numBts;
+        numThreads = threads;
         que = new Queue();
         options = new ChromeOptions();
         options.addArguments("--headless");
@@ -32,25 +47,31 @@ public class Flooder {
     }
 
     public void start() {
-        worker();
+        Worker thread;
+        for (byte i = 0; i < numThreads; i++) {
+            thread = new Worker();
+            thread.start();
+        }
+    }
+
+    private class Worker extends Thread{
+        public void run() {
+            int it;
+    
+            while (!que.isEmpty()) {
+                it = que.getJob();
+                try {
+                    logInABot(it);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void addJobs() {
         for (int i = 0; i < numBots; i++) {
             que.addJob(i);
-        }
-    }
-
-    private void worker() {
-        int it;
-
-        while (!que.isEmpty()) {
-            it = que.getJob();
-            try {
-                logInABot(it);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -82,8 +103,9 @@ public class Flooder {
         int num = Integer.parseInt(props.getProperty("num"));
         String id = props.getProperty("id");
         String name = props.getProperty("name");
+        byte threads = Byte.parseByte(props.getProperty("threads"));
         
-        Flooder fl = new Flooder(num, id, name);
+        Flooder fl = new Flooder(num, id, name, threads);
         fl.start();
 
         while (true) {Thread.sleep(1000);}
