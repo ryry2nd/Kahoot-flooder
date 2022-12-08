@@ -19,5 +19,7 @@ public class App {
         
         Flooder fl = new Flooder(num, id, name, threads);
         fl.start();
+
+        fl.join();
     }
 }

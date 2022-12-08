@@ -14,6 +14,7 @@ public class Flooder{
     private int numBots;
     private byte numThreads;
     private ChromeDriver[] drivers;
+    private Worker[] threadClasses;
 
     public Flooder(int numBts, String identification, String nme){
         id = identification;
@@ -21,16 +22,13 @@ public class Flooder{
         numBots = numBts;
         numThreads = 1;
         drivers = new ChromeDriver[numBots];
+        threadClasses = new Worker[numThreads];
         que = new Queue();
         options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments(" --allowed-ips");
 
         addJobs();
-
-        for (int i = 0; i < numBts; i++) {
-            drivers[i].close();
-        }
     }
 
     public Flooder(int numBts, String identification, String nme, byte threads) {
@@ -39,12 +37,27 @@ public class Flooder{
         numBots = numBts;
         numThreads = threads;
         drivers = new ChromeDriver[numBots];
+        threadClasses = new Worker[numThreads];
         que = new Queue();
         options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments(" --allowed-ips");
 
         addJobs();
+    }
+
+    public void join() throws InterruptedException {
+        int i;
+
+        for (i = 0; i < numThreads; i++){
+            threadClasses[i].join();
+        }
+
+        for (i = 0; i < numBots; i++) {
+            if (drivers[i] != null) {
+                drivers[i].close();
+            }
+        }
     }
 
     private void addJobs() {
@@ -58,6 +71,7 @@ public class Flooder{
         for (byte i = 0; i < numThreads; i++) {
             thread = new Worker();
             thread.start();
+            threadClasses[i] = thread;
         }
     }
 
