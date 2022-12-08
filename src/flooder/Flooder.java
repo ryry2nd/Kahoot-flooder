@@ -14,15 +14,15 @@ public class Flooder{
     private int numBots;
     private byte numThreads;
     private ChromeDriver[] drivers;
-    private Worker[] threadClasses;
+    private Worker[] threads;
 
-    public Flooder(int numBts, String identification, String nme){
-        id = identification;
-        name = nme;
-        numBots = numBts;
+    public Flooder(int numBots, String id, String name){
+        this.id = id;
+        this.name = name;
+        this.numBots = numBots;
         numThreads = 1;
         drivers = new ChromeDriver[numBots];
-        threadClasses = new Worker[numThreads];
+        threads = new Worker[numThreads];
         que = new Queue();
         options = new ChromeOptions();
         options.addArguments("--headless");
@@ -31,13 +31,13 @@ public class Flooder{
         addJobs();
     }
 
-    public Flooder(int numBts, String identification, String nme, byte threads) {
-        id = identification;
-        name = nme;
-        numBots = numBts;
-        numThreads = threads;
+    public Flooder(int numBots, String id, String name, byte numThreads) {
+        this.id = id;
+        this.name = name;
+        this.numBots = numBots;
+        this.numThreads = numThreads;
         drivers = new ChromeDriver[numBots];
-        threadClasses = new Worker[numThreads];
+        threads = new Worker[numThreads];
         que = new Queue();
         options = new ChromeOptions();
         options.addArguments("--headless");
@@ -50,7 +50,7 @@ public class Flooder{
         int i;
 
         for (i = 0; i < numThreads; i++){
-            threadClasses[i].join();
+            threads[i].join();
         }
 
         for (i = 0; i < numBots; i++) {
@@ -71,7 +71,7 @@ public class Flooder{
         for (byte i = 0; i < numThreads; i++) {
             thread = new Worker();
             thread.start();
-            threadClasses[i] = thread;
+            threads[i] = thread;
         }
     }
 
