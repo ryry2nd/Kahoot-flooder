@@ -1,6 +1,5 @@
 package flooder;
 
-//import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.WebElement;
@@ -14,12 +13,32 @@ public class Flooder{
     private Queue que;
     private int numBots;
     private byte numThreads;
+    private ChromeDriver[] drivers;
 
     public Flooder(int numBts, String identification, String nme){
         id = identification;
         name = nme;
         numBots = numBts;
         numThreads = 1;
+        drivers = new ChromeDriver[numBots];
+        que = new Queue();
+        options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments(" --allowed-ips");
+
+        addJobs();
+
+        for (int i = 0; i < numBts; i++) {
+            drivers[i].close();
+        }
+    }
+
+    public Flooder(int numBts, String identification, String nme, byte threads) {
+        id = identification;
+        name = nme;
+        numBots = numBts;
+        numThreads = threads;
+        drivers = new ChromeDriver[numBots];
         que = new Queue();
         options = new ChromeOptions();
         options.addArguments("--headless");
@@ -28,17 +47,10 @@ public class Flooder{
         addJobs();
     }
 
-    public Flooder(int numBts, String identification, String nme, byte threads) {
-        id = identification;
-        name = nme;
-        numBots = numBts;
-        numThreads = threads;
-        que = new Queue();
-        options = new ChromeOptions();
-        options.addArguments("--headless");
-        options.addArguments(" --allowed-ips");
-
-        addJobs();
+    private void addJobs() {
+        for (int i = 0; i < numBots; i++) {
+            que.addJob(i);
+        }
     }
 
     public void start() {
@@ -64,13 +76,7 @@ public class Flooder{
         }
     }
 
-    private void addJobs() {
-        for (int i = 0; i < numBots; i++) {
-            que.addJob(i);
-        }
-    }
-
-    private void logInABot(int botNum) throws InterruptedException {
+    public void logInABot(int botNum) throws InterruptedException {
         ChromeDriver driver = new ChromeDriver(options);
         WebElement nameBox;
         
@@ -82,11 +88,7 @@ public class Flooder{
 
         nameBox.sendKeys(name + botNum);
         nameBox.sendKeys(Keys.ENTER);
-
-        Thread.sleep(500);
-
-        if (driver.findElements(By.xpath("//input[@name='nickname']")).size() > 0) {
-            driver.close();
-        }
+        
+        drivers[botNum] = driver;
     }
 }

@@ -1,12 +1,13 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import java.util.Properties;
 
 import flooder.Flooder;
 
-public class main {
-    public static void Main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
+public class App {
+    public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
         Properties props = new Properties();
 
         props.load(new FileInputStream("config.properties"));
@@ -18,7 +19,5 @@ public class main {
         
         Flooder fl = new Flooder(num, id, name, threads);
         fl.start();
-
-        while (true) {Thread.sleep(1000);}
     }
 }
